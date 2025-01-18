@@ -13,6 +13,7 @@ interface EmployeeListQueryResponse {
 
 export default function EmployeeListPage() {
     const [lista, setLista]=useState<EmployeeListQueryResponse[]>([])
+    
     useEffect(()=>{
         fetch("api/employees/list")
         .then((response)=>{
@@ -22,16 +23,17 @@ export default function EmployeeListPage() {
             setLista(data as EmployeeListQueryResponse[])
         })
     })
-   
+
     return<>
     <Typography variant="h4" sx={{textAlign:"center", mt:4, mb:4}}>
         Employee
     </Typography>
-    
+  
     <TableContainer component={Paper}>
         <Table sx={{minWidth: 650}} aria-label="simple table">
             <TableHead>
                 <TableRow>
+                    <StyledTableHeadCell>Code</StyledTableHeadCell>
                     <StyledTableHeadCell>FirstName</StyledTableHeadCell>
                     <StyledTableHeadCell>LastName</StyledTableHeadCell>
                     <StyledTableHeadCell>Adress</StyledTableHeadCell>
@@ -42,9 +44,10 @@ export default function EmployeeListPage() {
             <TableBody>
                 {lista.map((row)=>(
                     <TableRow
-                    key={row.Id}
+                    key={row.Id } 
                     sx={{"&:last-child td, &:last-child th": { border: 0 }}}
                     >
+                        <TableCell>{row.Code}</TableCell>
                         <TableCell>{row.FirstName}</TableCell>
                         <TableCell>{row.LastName}</TableCell>
                         <TableCell>{row.Address}</TableCell>
