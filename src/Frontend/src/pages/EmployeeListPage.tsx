@@ -1,4 +1,4 @@
-import { Paper, styled, Table, TableBody, TableCell, tableCellClasses, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
+import { Button, Paper, styled, Table, TableBody, TableCell, tableCellClasses, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
 import  { useEffect, useState } from "react";
 
 interface EmployeeListQueryResponse {
@@ -23,12 +23,36 @@ export default function EmployeeListPage() {
             setLista(data as EmployeeListQueryResponse[])
         })
     })
-
+    const exportToXML = ()=>{
+        const xmlData = lista
+        .map(employee=>{
+            return`
+            <Employee>
+                <Id>${employee.Id}</Id>
+                <Code>${employee.Code}</Code>
+                <FirstName>${employee.FirstName}</FirstName>
+                <LastName>${employee.LastName}</LastName>
+                <Address>${employee.Address}</Address>
+                <Email>${employee.Email}</Email>
+                <Phone>${employee.Phone}</Phone>
+            </Employee>
+            `}).join("")
+            const xmlContent = `<?xml version="1.0" encoding="UTF-8"?>
+            <Employees>${xmlData}</Employees>`
+        const blob = new Blob([xmlContent],{type: "application/xml"})
+        const url = URL.createObjectURL(blob)
+        const link = document.createElement("a")
+        link.href=url
+        link.download="employees.xml"
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+    }
     return<>
     <Typography variant="h4" sx={{textAlign:"center", mt:4, mb:4}}>
         Employee
     </Typography>
-  
+    <Button variant="contained" color="primary" onClick={exportToXML} sx={{mb:2}}>Export XML</Button>
     <TableContainer component={Paper}>
         <Table sx={{minWidth: 650}} aria-label="simple table">
             <TableHead>
