@@ -1,19 +1,20 @@
-import { Button, Paper, styled, Table, TableBody, TableCell, tableCellClasses, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
-import  { useEffect, useState } from "react";
+import { Box, Button, Paper, styled, Table, TableBody, TableCell, tableCellClasses, TableContainer, TableHead, TableRow, TextField, Typography } from "@mui/material";
+import  React, { useEffect, useState } from "react";
 
 interface EmployeeListQueryResponse {
     Id: number;
     Code:number;
-    FirstName:string;
-    LastName:string;
-    Address:string;
-    Email:string;
-    Phone:string;
+    FirstName?:string;
+    LastName?:string;
+    Address?:string;
+    Email?:string;
+    Phone?:string;
 }
 
 export default function EmployeeListPage() {
     const [lista, setLista]=useState<EmployeeListQueryResponse[]>([])
-    
+    const [filteredLista, setFilteredLista]=useState<EmployeeListQueryResponse[]>([])
+    const [filters,SetFilters]=useState({Nome: "" , Email:""})
     useEffect(()=>{
         fetch("api/employees/list")
         .then((response)=>{
@@ -21,8 +22,19 @@ export default function EmployeeListPage() {
         })
         .then((data)=>{
             setLista(data as EmployeeListQueryResponse[])
+            setFilteredLista(data as EmployeeListQueryResponse[])
         })
-    })
+    },[])
+    const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>)=>{
+        const{name, value}=event.target
+        SetFilters((prevFilters)=>({...prevFilters, [name]:value}))
+
+        setFilteredLista(
+            lista.filter((employee)=> (name === "Nome" ? employee.FirstName?.toLowerCase().includes(value.toLowerCase()):true)
+        &&lista.filter((employee)=> (name === "Email" ? employee.Email?.toLowerCase().includes(value.toLowerCase()):true)
+    )
+        ))
+    }
     const exportToXML = ()=>{
         const xmlData = lista
         .map(employee=>{
@@ -52,7 +64,11 @@ export default function EmployeeListPage() {
     <Typography variant="h4" sx={{textAlign:"center", mt:4, mb:4}}>
         Employee
     </Typography>
-    <Button variant="contained" color="primary" onClick={exportToXML} sx={{mb:2}}>Export XML</Button>
+    <Box sx={{display:"flex", justifyContent:"center", gap: 2, mb:2}}>
+        <TextField label="Nome" name="Nome" value={filters.Nome} onChange={handleFilterChange} variant="outlined"/>
+        <TextField label="Email" name="Email" value={filters.Email} onChange={handleFilterChange} variant="outlined"/>
+    </Box>
+    <Button variant="contained" color="primary" onClick={exportToXML} sx={{mb:2}} >Export XML</Button>
     <TableContainer component={Paper}>
         <Table sx={{minWidth: 650}} aria-label="simple table">
             <TableHead>
@@ -66,15 +82,15 @@ export default function EmployeeListPage() {
                 </TableRow>
             </TableHead>
             <TableBody>
-                {lista.map((row)=>(
+                {filteredLista.map((row)=>(
                     <TableRow
                     key={row.Id } 
                     sx={{"&:last-child td, &:last-child th": { border: 0 }}}
                     >
                         <TableCell>{row.Code}</TableCell>
-                        <TableCell>{row.FirstName}</TableCell>
-                        <TableCell>{row.LastName}</TableCell>
-                        <TableCell>{row.Address}</TableCell>
+                        <TableCell>{row.FirstName }</TableCell>
+                        <TableCell>{row.LastName }</TableCell>
+                        <TableCell>{row.Address }</TableCell>
                         <TableCell>{row.Email}</TableCell>
                         <TableCell>{row.Phone}</TableCell>
                     </TableRow>
