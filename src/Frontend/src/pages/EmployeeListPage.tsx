@@ -2,51 +2,58 @@ import { Box, Button, Paper, styled, Table, TableBody, TableCell, tableCellClass
 import  React, { useEffect, useState } from "react";
 
 interface EmployeeListQueryResponse {
-    Id: number;
-    Code:number;
-    FirstName?:string;
-    LastName?:string;
-    Address?:string;
-    Email?:string;
-    Phone?:string;
+    id: number;
+    firstName:string;
+    lastName:string;
+    address: string;
+    email: string;
+    phone: string;
+    department:{
+        code:string;
+        description:string;
+    }
+
 }
 
 export default function EmployeeListPage() {
     const [lista, setLista]=useState<EmployeeListQueryResponse[]>([])
     const [filteredLista, setFilteredLista]=useState<EmployeeListQueryResponse[]>([])
     const [filters,SetFilters]=useState({Nome: "" , Email:""})
-    useEffect(()=>{
+    useEffect(() => {
         fetch("api/employees/list")
-        .then((response)=>{
-            return response.json()
-        })
-        .then((data)=>{
-            setLista(data as EmployeeListQueryResponse[])
-            setFilteredLista(data as EmployeeListQueryResponse[])
-        })
-    },[])
-    const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>)=>{
-        const{name, value}=event.target
-        SetFilters((prevFilters)=>({...prevFilters, [name]:value}))
-
+            .then((response) => { return response.json()})
+            .then((data) => {
+                setLista(data as EmployeeListQueryResponse[]);
+                setFilteredLista(data as EmployeeListQueryResponse[]);
+            })
+            .catch((error)=>console.error("Errore durante il fetch:", error))
+    }, []);
+    const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = event.target;
+        SetFilters((prevFilters) => ({ ...prevFilters, [name]: value }));
+    
         setFilteredLista(
-            lista.filter((employee)=> (name === "Nome" ? employee.FirstName?.toLowerCase().includes(value.toLowerCase()):true)
-        &&lista.filter((employee)=> (name === "Email" ? employee.Email?.toLowerCase().includes(value.toLowerCase()):true)
-    )
-        ))
-    }
+            lista.filter((employee) =>
+                (name === "Nome" ? employee.firstName?.toLowerCase().includes(value.toLowerCase()) : true) &&
+                (name === "Email" ? employee.email?.toLowerCase().includes(value.toLowerCase()) : true)
+            )
+        );
+    };
     const exportToXML = ()=>{
         const xmlData = lista
         .map(employee=>{
             return`
             <Employee>
-                <Id>${employee.Id}</Id>
-                <Code>${employee.Code}</Code>
-                <FirstName>${employee.FirstName}</FirstName>
-                <LastName>${employee.LastName}</LastName>
-                <Address>${employee.Address}</Address>
-                <Email>${employee.Email}</Email>
-                <Phone>${employee.Phone}</Phone>
+                <Id>${employee.id}</Id>
+                <Nome>${employee.firstName}</Nome>
+                <LastName>${employee.lastName}</LastName>
+                <Address>${employee.address}</Address>
+                <Email>${employee.email}</Email>
+                <Phone>${employee.phone}</Phone>
+                <Department>
+                        <Code>${employee.department?.code || "N/A"}</Code>
+                        <Description>${employee.department?.description || "N/A"}</Description>
+                </Department>
             </Employee>
             `}).join("")
             const xmlContent = `<?xml version="1.0" encoding="UTF-8"?>
@@ -73,26 +80,29 @@ export default function EmployeeListPage() {
         <Table sx={{minWidth: 650}} aria-label="simple table">
             <TableHead>
                 <TableRow>
-                    <StyledTableHeadCell>Code</StyledTableHeadCell>
+                    <StyledTableHeadCell>Id</StyledTableHeadCell>
                     <StyledTableHeadCell>FirstName</StyledTableHeadCell>
                     <StyledTableHeadCell>LastName</StyledTableHeadCell>
                     <StyledTableHeadCell>Adress</StyledTableHeadCell>
                     <StyledTableHeadCell>Email</StyledTableHeadCell>
                     <StyledTableHeadCell>Phone</StyledTableHeadCell>
+                    <StyledTableHeadCell>Department</StyledTableHeadCell>
+                
                 </TableRow>
             </TableHead>
             <TableBody>
-                {filteredLista.map((row)=>(
+            {filteredLista.map((row)=>(
                     <TableRow
-                    key={row.Id } 
+                        key={row.id }
                     sx={{"&:last-child td, &:last-child th": { border: 0 }}}
                     >
-                        <TableCell>{row.Code}</TableCell>
-                        <TableCell>{row.FirstName }</TableCell>
-                        <TableCell>{row.LastName }</TableCell>
-                        <TableCell>{row.Address }</TableCell>
-                        <TableCell>{row.Email}</TableCell>
-                        <TableCell>{row.Phone}</TableCell>
+                        <TableCell>{row.id }</TableCell>
+                        <TableCell>{row.firstName}</TableCell>
+                        <TableCell>{row.lastName}</TableCell>
+                        <TableCell>{row.address}</TableCell>
+                        <TableCell>{row.email }</TableCell>
+                        <TableCell>{row.phone}</TableCell>
+                        <TableCell>{row.department ? `${row.department.code}- ${row.department.description}`:"N/A"}</TableCell>
                     </TableRow>
                 ))}
             </TableBody>
