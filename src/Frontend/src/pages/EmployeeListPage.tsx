@@ -25,16 +25,16 @@ export default function EmployeeListPage() {
         fetch("api/employees/list")
             .then((response) => { return response.json()})
             .then((data) => {
-                setLista(data as EmployeeListQueryResponse[]);
-                setFilteredLista(data as EmployeeListQueryResponse[]);
+                setLista(data as EmployeeListQueryResponse[]);//imposta la lista completa dei dipendenti
+                setFilteredLista(data as EmployeeListQueryResponse[]);//imposta anche la la lista filtrata inzialmente uguale a quella completa 
             })
             .catch((error)=>console.error("Errore durante il fetch:", error))
     }, []);
-    //funzione per filtrare per nome e email 
+    //funzione per gestire il cambiamento dei filtri di ricerca
     const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = event.target;
         SetFilters((prevFilters) => ({ ...prevFilters, [name]: value }));
-    
+        //filtra la lista dei dipendenti in base ai filtri (nome e cognome)
         setFilteredLista(
             lista.filter((employee) =>
                 (name === "Nome" ? employee.firstName?.toLowerCase().includes(value.toLowerCase()) : true) &&
@@ -44,6 +44,7 @@ export default function EmployeeListPage() {
     };
     //funzione per bottone xml 
     const exportToXML = ()=>{
+        //Crea i dati xml per ogni dipedente
         const xmlData = lista
         .map(employee=>{
             return`
@@ -59,10 +60,13 @@ export default function EmployeeListPage() {
                         <Description>${employee.department?.description || "N/A"}</Description>
                 </Department>
             </Employee>
-            `}).join("")
+            `}).join("")//unisce tutte le stringhe xml in un'unica stringa
+            // crea il contenuto xml completo
             const xmlContent = `<?xml version="1.0" encoding="UTF-8"?>
-            <Employees>${xmlData}</Employees>`
+            <Employees>${xmlData}</Employees>`;
+        //Crea un blob contentente i dati xml
         const blob = new Blob([xmlContent],{type: "application/xml"})
+        // crea un url per il blob e un link per il download
         const url = URL.createObjectURL(blob)
         const link = document.createElement("a")
         link.href=url
@@ -75,6 +79,7 @@ export default function EmployeeListPage() {
     <Typography variant="h4" sx={{textAlign:"center", mt:4, mb:4}}>
         Employee
     </Typography>
+    
     <Filtro filters={filters} onFilterChange={handleFilterChange}/>
     <Bottone onExport={()=>exportToXML()}/>
     <EmployeeTabella employees={filteredLista}/>

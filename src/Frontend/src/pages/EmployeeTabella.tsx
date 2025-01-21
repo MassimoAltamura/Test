@@ -21,6 +21,7 @@ const EmployeeTabella:React.FC<EmployeeTabellaProps>=({employees})=>{
         <Table sx={{minWidth: 650}} aria-label="simple table">
             <TableHead>
                 <TableRow>
+                    {/*celle di intestazione personalizzate */}
                     <StyledTableHeadCell>Id</StyledTableHeadCell>
                     <StyledTableHeadCell>FirstName</StyledTableHeadCell>
                     <StyledTableHeadCell>LastName</StyledTableHeadCell>
@@ -43,6 +44,7 @@ const EmployeeTabella:React.FC<EmployeeTabellaProps>=({employees})=>{
                         <TableCell>{row.address}</TableCell>
                         <TableCell>{row.email }</TableCell>
                         <TableCell>{row.phone}</TableCell>
+                        {/*verifica se il dipartimento esiste e formatta i dati */}
                         <TableCell>{row.department ? `${row.department.code}- ${row.department.description}`:"N/A"}</TableCell>
                     </TableRow>
                 ))}
@@ -51,6 +53,7 @@ const EmployeeTabella:React.FC<EmployeeTabellaProps>=({employees})=>{
     </TableContainer>
     )
 }
+//componente stile celle 
 const StyledTableHeadCell = styled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.head}`]: {
       backgroundColor: theme.palette.primary.light,
