@@ -1,6 +1,8 @@
-import { Box, Button, Paper, styled, Table, TableBody, TableCell, tableCellClasses, TableContainer, TableHead, TableRow, TextField, Typography } from "@mui/material";
+import {  Typography } from "@mui/material";
 import  React, { useEffect, useState } from "react";
-
+import EmployeeTabella from "./EmployeeTabella";
+import Bottone from "./Bottone";
+import Filtro from "./Filtro";
 interface EmployeeListQueryResponse {
     id: number;
     firstName:string;
@@ -28,6 +30,7 @@ export default function EmployeeListPage() {
             })
             .catch((error)=>console.error("Errore durante il fetch:", error))
     }, []);
+    //funzione per filtrare per nome e email 
     const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = event.target;
         SetFilters((prevFilters) => ({ ...prevFilters, [name]: value }));
@@ -39,6 +42,7 @@ export default function EmployeeListPage() {
             )
         );
     };
+    //funzione per bottone xml 
     const exportToXML = ()=>{
         const xmlData = lista
         .map(employee=>{
@@ -71,48 +75,8 @@ export default function EmployeeListPage() {
     <Typography variant="h4" sx={{textAlign:"center", mt:4, mb:4}}>
         Employee
     </Typography>
-    <Box sx={{display:"flex", justifyContent:"center", gap: 2, mb:2}}>
-        <TextField label="Nome" name="Nome" value={filters.Nome} onChange={handleFilterChange} variant="outlined"/>
-        <TextField label="Email" name="Email" value={filters.Email} onChange={handleFilterChange} variant="outlined"/>
-    </Box>
-    <Button variant="contained" color="primary" onClick={exportToXML} sx={{mb:2}} >Export XML</Button>
-    <TableContainer component={Paper}>
-        <Table sx={{minWidth: 650}} aria-label="simple table">
-            <TableHead>
-                <TableRow>
-                    <StyledTableHeadCell>Id</StyledTableHeadCell>
-                    <StyledTableHeadCell>FirstName</StyledTableHeadCell>
-                    <StyledTableHeadCell>LastName</StyledTableHeadCell>
-                    <StyledTableHeadCell>Adress</StyledTableHeadCell>
-                    <StyledTableHeadCell>Email</StyledTableHeadCell>
-                    <StyledTableHeadCell>Phone</StyledTableHeadCell>
-                    <StyledTableHeadCell>Department</StyledTableHeadCell>
-                
-                </TableRow>
-            </TableHead>
-            <TableBody>
-            {filteredLista.map((row)=>(
-                    <TableRow
-                        key={row.id }
-                    sx={{"&:last-child td, &:last-child th": { border: 0 }}}
-                    >
-                        <TableCell>{row.id }</TableCell>
-                        <TableCell>{row.firstName}</TableCell>
-                        <TableCell>{row.lastName}</TableCell>
-                        <TableCell>{row.address}</TableCell>
-                        <TableCell>{row.email }</TableCell>
-                        <TableCell>{row.phone}</TableCell>
-                        <TableCell>{row.department ? `${row.department.code}- ${row.department.description}`:"N/A"}</TableCell>
-                    </TableRow>
-                ))}
-            </TableBody>
-        </Table>
-    </TableContainer>
+    <Filtro filters={filters} onFilterChange={handleFilterChange}/>
+    <Bottone onExport={()=>exportToXML()}/>
+    <EmployeeTabella employees={filteredLista}/>
     </>
 }
-const StyledTableHeadCell = styled(TableCell)(({ theme }) => ({
-    [`&.${tableCellClasses.head}`]: {
-      backgroundColor: theme.palette.primary.light,
-      color: theme.palette.common.white,
-    },
-  }));
